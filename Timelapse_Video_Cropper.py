@@ -398,7 +398,7 @@ def main():
    try:
       config = load_config(config_file_name)
       if not os.path.isfile(config['video_source']):
-         print('video_source is not a file:\n\t%s' % config['video_source'])
+         print('video_source is not a file: \n\t%s' % config['video_source'])
          print_config_file(config)
          return 1
       normalize_config(config)
