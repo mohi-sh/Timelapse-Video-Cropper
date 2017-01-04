@@ -380,7 +380,7 @@ def load_config(config_file_name):
    return config
 
 def main():
-   config_file_name = r'edit_video_config.json'
+   config_file_name = r'timelapse_video_cropper_config.json'
    # Command line config takes precedence if one is found
    if len(sys.argv) > 1:
       if os.path.isfile(sys.argv[1]):
