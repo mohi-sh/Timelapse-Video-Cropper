@@ -253,3 +253,4 @@ paket-files/
 /timelapse_video_cropper_config.json
 /Timelapse-Video-Cropper.sln
 /Timelapse-Video-Cropper.pyproj
+/rsl/__pycache__

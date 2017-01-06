@@ -1,9 +1,23 @@
 import os
 import sys
-import json
 import imutils
 import numpy as np
 import cv2
+import rsl.json_config as json_config
+
+default_config = {
+   'config_file_name': r'timelapse_video_cropper_config.json',
+   'video_source': 'your_video.mp4',
+   'keep_frame_mod': 1,
+   'keep_frame_mod_min': 1,
+   'keep_frame_mod_max': 1,
+   'steady_mode': False,
+   'crop_x1': 0,
+   'crop_y1': 0,
+   'crop_x2': 1920,
+   'crop_y2': 1080,
+   'fourcc_text': 'XVID'
+   }
 
 def ensure_a_window(display_on, frame):
    show(display_on, frame)
@@ -233,8 +247,8 @@ def get_user_input_while_looping(config):
          elif key == ord('v') and config['keep_frame_mod'] > 1:
             config['keep_frame_mod'] -= 1
          elif key == ord('z'):
-            save_config(config)
-            print_config_file(config)
+            json_config.save(config)
+            json_config.print_config(config)
 
       return anchor_gray_frame
    except (KeyboardInterrupt):
@@ -266,8 +280,7 @@ def write_video(config, anchor_gray_frame):
       target_file_base = r'xy%d-%d_%dx%d_mod%d_steady(%d)_%s_' % (config['crop_x1'], config['crop_y1'], config['crop_x2'], config['crop_y2'], config['keep_frame_mod'], config['steady_mode'], source_file)
       target_video_filename = r'%s.avi' % target_file_base 
       target_config_filename = r'%s\%s.json' % (base_dir, target_file_base)
-      config['config_file_name'] = target_config_filename
-      save_config(config)
+      json_config.save(config, config_file_name = target_config_filename)
       print('\t\tto\n\t%s' % target_video_filename)
 
       fourcc = cv2.VideoWriter_fourcc(*config['fourcc_text'])
@@ -341,46 +354,8 @@ def edit_movie(config):
    anchor_gray_frame = get_user_input_while_looping(config)
    write_video(config, anchor_gray_frame)
 
-def print_config_file(config):
-   print('Config file located at:\n\t%s\nPoint "video_source" path to your video. Use fully qualified path or relative path. Current working directory:\n\t%s' \
-      % (config['config_file_name'], os.getcwd()))
-   print('Current config contents:')
-   with open(config['config_file_name'], 'r') as f:
-      for line in f:
-         print(line)
-
-def save_config(config):
-   with open(config['config_file_name'], 'w') as f:
-      json.dump(config, f)
-
-def normalize_config(config):
-   config['config_file_name'] = config.get('config_file_name', r'edit_video_config.json')
-   config['video_source'] = config.get('video_source', 'your_video.mp4')
-   config['keep_frame_mod'] = config.get('keep_frame_mod', 1)
-   config['keep_frame_mod_min'] = config.get('keep_frame_mod_min', config['keep_frame_mod'])
-   config['keep_frame_mod_max'] = config.get('keep_frame_mod_max', config['keep_frame_mod'])
-   config['steady_mode'] = config.get('steady_mode', False)
-   config['crop_x1'] = config.get('crop_x1', 0)
-   config['crop_y1'] = config.get('crop_y1', 0)
-   config['crop_x2'] = config.get('crop_x2', 1920)
-   config['crop_y2'] = config.get('crop_y2', 1080)
-   config['fourcc_text'] = config.get('fourcc_text', 'XVID')
-
-def create_default_config(config_file_name):
-   config = {'config_file_name':config_file_name}
-   normalize_config(config)
-   save_config(config)
-   print('New config file created.')
-   print_config_file(config)
-
-def load_config(config_file_name):
-   with open(config_file_name, 'r') as f:
-      config = json.load(f)
-   config['config_file_name'] = config_file_name
-   return config
-
 def main():
-   config_file_name = r'timelapse_video_cropper_config.json'
+   config_file_name = default_config['config_file_name']
    # Command line config takes precedence if one is found
    if len(sys.argv) > 1:
       if os.path.isfile(sys.argv[1]):
@@ -388,23 +363,24 @@ def main():
          full_path_file_stem, ext = os.path.splitext(cmd_line_filename)
          ext = ext.lower()
          if ext == '.json':
-            config_file_name = os.path.normpath(sys.argv[1])
+            config_file_name = cmd_line_filename
          elif ext in ['.mp4', '.avi']:
             config_file_name = r'%s.json' % (full_path_file_stem)
             if not os.path.exists(config_file_name):
-               config = {'config_file_name':config_file_name, 'video_source':cmd_line_filename}
-               save_config(config)
+               config = {'video_source':cmd_line_filename}
+               json_config.normalize(config, default_config)
+               json_config.save(config, config_file_name = config_file_name)
 
    try:
-      config = load_config(config_file_name)
+      config = json_config.load(config_file_name)
       if not os.path.isfile(config['video_source']):
          print('video_source is not a file: \n\t%s' % config['video_source'])
-         print_config_file(config)
+         json_config.print_config(config)
          return 1
-      normalize_config(config)
+      json_config.normalize(config, default_config)
       edit_movie(config)
    except (FileNotFoundError):
-      create_default_config()
+      json_config.create_default(default_config)
 
 if __name__ == '__main__':
    try:
