@@ -1,7 +1,7 @@
 import os
 import json
 
-def save(config: dict, config_file_name = None, video_source = None):
+def save(config: dict, config_file_name = None):
    if config_file_name is not None:
       config['config_file_name'] = config_file_name
    with open(config['config_file_name'], 'w') as f:
