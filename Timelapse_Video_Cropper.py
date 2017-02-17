@@ -393,14 +393,14 @@ def main():
             return 1
         json_config.normalize(config, default_config)
         edit_movie(config)
-    except (FileNotFoundError):
+    except FileNotFoundError:
         json_config.create_default(default_config)
 
 if __name__ == '__main__':
     try:
         main()
         print('\n[Normal Exit]')
-    except (KeyboardInterrupt):
+    except KeyboardInterrupt:
         print('\n[User Exit]')
-    except (SystemExit):
+    except SystemExit:
         print('\n[System Exit]')
