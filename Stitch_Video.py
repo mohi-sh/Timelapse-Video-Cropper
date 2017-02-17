@@ -18,6 +18,7 @@ def get_cap_prop_size(cap):
 def mp4_file_iterator(config):
     return glob.iglob(r'%s\*.mp4' % config['source_dir_name'])
 
+
 def stitch_video(config):
     print('Stitching all MP4 files in directory:\n\t%s' % config['source_dir_name'])
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")

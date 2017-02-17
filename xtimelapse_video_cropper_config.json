@@ -1,0 +1,13 @@
+{
+  "steady_mode": false,
+  "config_file_name": "timelapse_video_cropper_config.json",
+  "crop_x1": 811,
+  "keep_frame_mod_min": 10,
+  "keep_frame_mod": 23,
+  "fourcc_text": "XVID",
+  "crop_y1": 129,
+  "keep_frame_mod_max": 10,
+  "crop_x2": 1765,
+  "video_source": "T:\\Scott\\Documents\\Work\\timelapse\\VID_20160902_141618_backporch-sky-Sep-03-2016_highres.mp4",
+  "crop_y2": 701
+}
