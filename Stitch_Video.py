@@ -1,5 +1,6 @@
 import glob
 import os
+import cv2
 import rsl.json_config as json_config
 
 default_config = {
@@ -9,8 +10,19 @@ default_config = {
 
 
 def stitch_video(config):
-    for filename in glob.iglob(r'%s\*.mp4' % config['source_dir_name']):
-        print('/foobar/%s' % filename)
+    for source_filename in glob.iglob(r'%s\*.mp4' % config['source_dir_name']):
+        print('Reading: %s' % source_filename)
+        source_fullpath = os.path.join(config['source_dir_name'], source_filename)
+        cap = cv2.VideoCapture(source_fullpath)
+        while True:
+            (grabbed, current_frame) = cap.read()
+            # if the frame could not be grabbed, then we have reached the end of the video
+            if not grabbed:
+                break
+            cv2.imshow('Source Video', current_frame)
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord('q'):
+                raise KeyboardInterrupt
 
 
 def main():
