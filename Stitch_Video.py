@@ -15,14 +15,27 @@ def get_cap_prop_size(cap):
     return int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
 
+def mp4_file_iterator(config):
+    return glob.iglob(r'%s\*.mp4' % config['source_dir_name'])
+
 def stitch_video(config):
+    print('Stitching all MP4 files in directory:\n\t%s' % config['source_dir_name'])
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     target_filename = '%s_stitched.avi' % timestamp
     target_fullpath = os.path.join(config['source_dir_name'], target_filename)
     fourcc = cv2.VideoWriter_fourcc(*config['fourcc_text'])
     video = None
-    for source_filename in glob.iglob(r'%s\*.mp4' % config['source_dir_name']):
-        print('Reading: %s' % source_filename)
+    file_list = mp4_file_iterator(config)
+    n = 0
+    for f in file_list:
+        n += 1
+    print('Found %d MP4 files.' % n)
+    print('Writing stitched video to:\n\t%s' % target_fullpath)
+    file_list = mp4_file_iterator(config)
+    i = 0
+    for source_filename in file_list:
+        i += 1
+        print('%d/%d] %s' % (i, n, source_filename))
         source_fullpath = os.path.join(config['source_dir_name'], source_filename)
         cap = cv2.VideoCapture(source_fullpath)
         if video is None:
